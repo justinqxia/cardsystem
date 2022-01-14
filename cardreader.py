@@ -17,10 +17,6 @@ for row in csvreader:
 
 def read():    
 
-    global date
-    global time
-    global logfile
-
     #Read card for ID number
     cardinfo = input("Please swipe your card")
     
