@@ -16,14 +16,23 @@ for row in csvreader:
     rows.append(row)
 
 def read():    
+
+    global date
+    global time
+    global logfile
+
     #Read card for ID number
     cardinfo = input("Please swipe your card")
-    id = cardinfo[45:54]
+    
+    #id = cardinfo[45:54]
+    id = cardinfo
+
     #print(id)
 
     #Check arrays for ID number
     for row in rows:
         if(row[0]==id):
+            logfile = row[4]
             print("Hello "+row[1])
             #Mbox("Greetings", "Hello "+row[1],1)
     
@@ -32,8 +41,29 @@ def read():
     date = now.strftime("%m/%d/%Y")
     print(date)
     time = now.strftime("%H:%M:%S")
-    print(time)	
     
+    #format time
+    meridiem = " A.M."
+    hour = int(time[0:2])
+    if hour > 12:
+        hour -= 12
+        meridiem = " P.M."
+    hour = str(hour)
+    minute = date[3:5]
+    time = str(hour + ":" + minute + meridiem)
+    print(time)
+    
+    #TEMPORARY
+    #logfile = studentinfo[4]
+    companion = input("Who is your companion?")
+    destination = input("What is your destination?")
+    eta = input("When do you expect to get back?")
+
+    studentlog = open(logfile,"a",newline = '')
+    rowwriter = csv.writer(studentlog,dialect='excel',)
+    rowwriter.writerow([date,destination,companion,time,eta,'Not Yet Returned'])
+
+
     leave = input("press 1 to quit")
     if (leave == "1"):
         quit()
@@ -42,13 +72,5 @@ def read():
 
 read()
 
-
-
-#print(rows)
-
-
 file.close()
-
-studentlog = open('henrycooperstudentlog.csv',"w")
-rowwriter = csv.writer(studentlog,dialect='excel',)
-rowwriter.
+studentlog.close()
