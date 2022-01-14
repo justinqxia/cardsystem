@@ -58,8 +58,8 @@ def read():
     studentlog = open(logfile,"a",newline = '')
     rowwriter = csv.writer(studentlog,dialect='excel',)
     rowwriter.writerow([date,destination,companion,time,eta,'Not Yet Returned'])
-
-
+    studentlog.close()
+    
     leave = input("press 1 to quit")
     if (leave == "1"):
         quit()
@@ -69,4 +69,3 @@ def read():
 read()
 
 file.close()
-studentlog.close()
