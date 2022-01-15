@@ -1,7 +1,7 @@
 import csv
 import tkinter as tk
 from datetime import datetime
-
+from playsound import playsound
 
 #Upload csv file to arrays
 file = open("cards.csv")
@@ -45,6 +45,7 @@ def read():
     
     #Check for error with swiping card
     if(error==True):
+        playsound('error.wav')
         window = tk.Tk()
         label = tk.Label(
             text="Error\nPlease swipe again",
@@ -59,7 +60,7 @@ def read():
         window.attributes('-topmost',True)
         window.mainloop()
     read()
-#end def run
+#end def read
 
 #for signing out of the building
 def signout(row):
