@@ -3,6 +3,20 @@ import tkinter as tk
 from datetime import datetime
 from playsound import playsound
 
+#Indexes
+#0- ID number
+#1- First Name
+#2- Last Name
+#3- Email
+#4- Card
+#5- Destination
+#6- Date
+#7- Sign-out Time
+#8- Expected Return Time
+#9- Actual Return Time
+#10- Companion
+#11- Special Permission
+
 #Upload csv file to arrays
 file = open("cards.csv")
 csvreader = csv.reader(file)
@@ -12,6 +26,7 @@ rows = []
 for row in csvreader:
     rows.append(row)
 
+#initialize list of possible shortcuts
 shortcuts=["1","2","3","4","0"]
 
 def read():    
@@ -107,6 +122,7 @@ def signin(row):
       row[i]=''
     return row  
 
+#shortcut function
 def shortcut(cardinfo):
     #list of people signed out
     if(cardinfo=="2"):
