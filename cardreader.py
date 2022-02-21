@@ -3,7 +3,7 @@ import tkinter as tk
 from datetime import datetime
 from playsound import playsound
 
-#Indexes
+#Indexes for cards
 #0- ID number
 #1- First Name
 #2- Last Name
