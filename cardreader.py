@@ -50,7 +50,7 @@ def read():
     for row in rows:
         if(row[0]==studentid):
             error=False
-            if(len(row[6])==0):
+            if(len(row[7])==0):
                 signout(row)
                 print(row[1]+" "+row[2]+" signed out")
                 print("")
@@ -94,15 +94,15 @@ def signout(row):
     #print(date)
     time = now.strftime("%H:%M:%S")
     #print(time)
-    row[6]=date
-    row[7]=time
+    row[7]=date
+    row[8]=time
     return row
 
 #for signing into the building
 def signin(row):
     now = datetime.now()
     returntime = now.strftime("%H:%M:%S")
-    row[9]=returntime
+    row[10]=returntime
     studentinfo = row[2] + row[1] + ".csv"
     sfile = open(studentinfo)
     csvreader2 = csv.reader(sfile)
@@ -118,7 +118,7 @@ def signin(row):
         csvwriter.writerow(row)
         for srow in studentrows:
             csvwriter.writerow(srow)
-    for i in range(5,12):
+    for i in range(6,13):
       row[i]=''
     return row  
 
@@ -155,17 +155,17 @@ def shortcut(cardinfo):
 
 #list of people signed out
 def listout(row):
-    if(len(row[6])!=0):
+    if(len(row[7])!=0):
         print(row[1]+" "+row[2])
 
 #cardcheck function
 def cardcheck(row):
-    if((row[7]<'18:30:00')and(len(row[7])!=0)):
+    if((row[8]<'18:30:00')and(len(row[8])!=0)):
         print(row[1]+" "+row[2])
 
 #curfew function
 def curfew(row,cardcolor):
-    if((len(row[6])!=0)and(row[4]==cardcolor)):
+    if((len(row[7])!=0)and(row[5]==cardcolor)):
         print(row[1]+" "+row[2])
 
 #Run first instance of the program
