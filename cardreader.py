@@ -39,18 +39,13 @@ def read():
     studentid = cardinfo[45:54]
     #print(id)
 
-    #reset variable found
-    error=True
-
     #use shortcut function
     if(cardinfo in shortcuts):
-        error=False
         shortcut(cardinfo)
 
     #Check arrays for ID number
     for row in rows:
         if(row[0]==studentid):
-            error=False
             if(len(row[7])==0):
                 signout(row)
                 print(row[1]+" "+row[2]+" signed out")
@@ -69,7 +64,7 @@ def read():
         csvwriter.writerows(rows)
     
     #Check for error with swiping card
-    if(error==True):
+    if(len(cardinfo)!=60):
         playsound('error.wav')
         window = tk.Tk()
         label = tk.Label(
