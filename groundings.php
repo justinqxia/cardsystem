@@ -15,57 +15,58 @@ if (mysqli_connect_errno()) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT password, email, color FROM accounts WHERE id = ?');
+$stmt = $con->prepare('SELECT password, email, type1 FROM accounts WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
-$stmt->bind_result($password, $email, $color);
+$stmt->bind_result($password, $email, $type1);
 $stmt->fetch();
 $stmt->close();
+if ($type1=='staff'||'staff1') {
+	echo '';
+}
+	else {
+		header('Location: homestudent.php');
+	}
 ?>
 <!DOCTYPE html>
 <html>
 	<head>
+	<style>
+      table,
+
+      td {
+        text-align: center;
+        vertical-align: middle;
+      }
+	  table.center {
+  margin-left: auto; 
+  margin-right: auto;
+	}
+    </style>
 		<meta charset="utf-8">
-		<title>Profile Page</title>
+		<title>Home Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+        <script src="https://kit.fontawesome.com/6f277423d3.js" crossorigin="anonymous"></script>
 	</head>
-	<body class="loggedin">
-		<nav class="navtop">
+
+	<!--menu-->
+	<body class="loggedin" onload="startTime()">
+	<nav class="navtop">
 			<div>
 				<h1>Card System</h1>
-				<a href="home.php"><i class="fas fa-home"></i>Home</a>
-				<a href="yourcard.php"><i class="fas fa-id-card"></i>Your Card</a>
-                <a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
+				<a href="homestaff.php"><i class="fas fa-home"></i>Home</a>
+				<a href="staffcard.php"><i class="fas fa-id-card"></i>Your Floor</a>
+                <a href="groundings.php"><i class="fa-solid fa-book"></i>Groundings</a>
+                <a href="staffprofile.php"><i class="fa-solid fa-user-gear"></i>Edit Cards</a>
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>
 		<div class="content">
-			<h2>Profile Page</h2>
-			<div>
-				<p>Your account details are below:</p>
-				<table>
-					<tr>
-						<td>ID Number<td>
-						<td><?=$_SESSION['id']?></td>
-					</tr>
-					<tr>
-						<td>Email:</td>
-						<td><?=$_SESSION['name']?></td>
-					</tr>
-					<tr>
-						<td>Name:</td>
-						<td><?=$email?></td>
-					</tr>
-					<tr>
-						<td>Your Card Color:</td>
-						<td><?=$color?></td>
-					</tr>
-				</table>
-			</div>
-		</div>
+			<h2>Groundings and other information</h2>
+        </div>
 <hr style="height:5px;background-color:black;border-width:0;color:gray;">
-<p style="text-align:center;">Developed by Justin Xia, Nico Minnich, and Henry Copper</p>
-	</body>
+<p style="text-align:center; font-size: 19px;">Developed by Nico Minnich, Justin Xia, and Henry Cooper</p>
+</body>
 </html>

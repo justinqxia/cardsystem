@@ -1,8 +1,39 @@
+<?php
+// We need to use sessions, so you should always start sessions using the below code.
+session_start();
+// If the user is not logged in redirect to the login page...
+if (!isset($_SESSION['loggedin'])) {
+	header('Location: index.html');
+	exit;
+}
+$DATABASE_HOST = 'localhost';
+$DATABASE_USER = 'root';
+$DATABASE_PASS = '';
+$DATABASE_NAME = 'phplogin';
+$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
+if (mysqli_connect_errno()) {
+	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
+}
+// We don't have the password or email info stored in sessions so instead we can get the results from the database.
+$stmt = $con->prepare('SELECT password, email, type1 FROM accounts WHERE id = ?');
+// In this case we can use the account ID to get the account info.
+$stmt->bind_param('i', $_SESSION['id']);
+$stmt->execute();
+$stmt->bind_result($password, $email, $type1);
+$stmt->fetch();
+$stmt->close();
+if ($type1=='staff'||'staff1') {
+	echo '';
+}
+	else {
+		header('Location: homestudent.php');
+	}
+?>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Card Submission</title>
+		<title>Overnight/Sick Card Submission</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 	</head>
@@ -10,28 +41,19 @@
 	<nav class="navtop">
 			<div>
 				<h1>Card System</h1>
-				<a href="homestudent.php"><i class="fas fa-home"></i>Home</a>
-				<a href="yourcard.php"><i class="fas fa-id-card"></i>Your Card</a>
-                <a href="studentprofile.php"><i class="fas fa-user-circle"></i>Profile</a>
+				<a href="homestaff.php"><i class="fas fa-home"></i>Home</a>
+				<a href="staffcard.php"><i class="fas fa-id-card"></i>Your Floor</a>
+                <a href="staffprofile.php"><i class="fas fa-user-circle"></i>Edit Cards</a>
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>
 
 <center><?php
 if (isset($_POST['submit'])) {
-    if (isset($_POST['return1']) && isset($_POST['destination']) && isset($_POST['destination1']) &&
-        isset($_POST['companion']) && isset($_POST['sp']) &&
-        isset($_POST['id']) && isset($_POST['email']) && isset($_POST['name']) && isset($_POST['floor'])) {
+    if (isset($_POST['sickcard'])) {
         
-        $return1 = $_POST['return1'];
-        $destination = $_POST['destination'];
-        $destination1 = $_POST['destination1'];
-        $companion = $_POST['companion'];
-        $sp = $_POST['sp'];
+        $sickcard = $_POST['sickcard'];
         $id = $_POST['id'];
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $floor = $_POST['floor'];
         
         $host = "localhost";
         $dbUsername = "root";
@@ -44,8 +66,8 @@ if (isset($_POST['submit'])) {
             die('Could not connect to the database.');
         }
         else {
-            $Select = "SELECT id FROM cards WHERE id = ? LIMIT 1";
-            $Insert = "INSERT INTO cards(destination, destination1, companion, return1, sp, id, email, floor) values(?, ?, ?, ?, ?, ?, ?, ?)";
+            $Select = "SELECT id FROM cards WHERE id = ?";
+            $Insert = "INSERT INTO cards(sickcard) values(?)";
 
             $stmt = $conn->prepare($Select);
             $stmt->bind_param("i", $id);
@@ -59,7 +81,7 @@ if (isset($_POST['submit'])) {
                 $stmt->close();
 
                 $stmt = $conn->prepare($Insert);
-                $stmt->bind_param("sssssisi", $destination, $destination1, $companion, $return1, $sp, $id, $email, $floor);
+                $stmt->bind_param("s", $sickcard);
                 if ($stmt->execute()) {
                     echo "Your card has succesufuly been uploaded to the database and you are ready to sign out!";
                 }
@@ -84,10 +106,6 @@ else {
 }
 ?></center>
 
-<form action="reset.php" style="text-align: center; ">
-<input type="hidden" name="id" value="<?=$_SESSION['id']?>" readonly>
-<input type="submit" value="Reset Your Card" name="reset">
-</form>
 <hr style="height:5px;background-color:black;border-width:0;color:gray;">
 <p style="text-align:center; font-size: 19px;">Developed by Nico Minnich, Justin Xia, and Henry Cooper</p>
 	</body>

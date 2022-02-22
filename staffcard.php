@@ -16,12 +16,25 @@ if (mysqli_connect_errno()) {
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
 $stmt = $con->prepare('SELECT companion, destination, sp, return1, destination1 FROM cards WHERE id = ?');
+$stmt1 = $con->prepare('SELECT type1 FROM accounts WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
 $stmt->bind_result($companion, $destination, $sp, $return1, $destination1);
 $stmt->fetch();
 $stmt->close();
+
+$stmt1->bind_param('i', $_SESSION['id']);
+$stmt1->execute();
+$stmt1->bind_result($type1);
+$stmt1->fetch();
+$stmt1->close();
+if ($type1=='staff'||'staff1') {
+	echo '';
+}
+	else {
+		header('Location: yourcard.php');
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -48,55 +61,27 @@ table, th, td {
 		<title>Your Card</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<script src="https://kit.fontawesome.com/6f277423d3.js" crossorigin="anonymous"></script>
     </head>
     <!--menu-->
 	<body class="loggedin" onload="startTime()">
 	<nav class="navtop">
 			<div>
 				<h1>Card System</h1>
-				<a href="homestudent.php"><i class="fas fa-home"></i>Home</a>
-				<a href="yourcard.php"><i class="fas fa-id-card"></i>Your Card</a>
-                <a href="studentprofile.php"><i class="fas fa-user-circle"></i>Profile</a>
+				<a href="homestaff.php"><i class="fas fa-home"></i>Home</a>
+				<a href="staffcard.php"><i class="fas fa-id-card"></i>Your Floor</a>
+				<a href="groundings.php"><i class="fa-solid fa-book"></i>Groundings</a>
+                <a href="staffprofile.php"><i class="fa-solid fa-user-gear"></i>Edit Cards</a>
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>
 		<div class="content">
-			<h2>Your Card</h2>
-            <table class="center" cellpadding=10 cellspacing=10>
-                <tr>
-                    <td>
-                        Destination
-                    </td>
-                    <td>
-                        Companion
-                    </td>
-                    <td>
-                        Expected Return Time
-                    </td>
-                    <td>
-                        Special Permission (SP)
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-			        <?=$destination?><p> </p><?=$destination1?>
-                    </td>
-                    <td>
-                    <?=$companion?>
-                    </td>
-                    <td>
-                    <?=$return1?>
-                    </td>
-                    <td>
-                    <?=$sp?>
-                    </td>
-            </table>
+			<h2>Cards Data</h2>
 		</div>
         <br>
-<form action="reset.php" style="text-align:center;">
-<!--ID Number Here--><input type="hidden" name="id" value="<?=$_SESSION['id']?>" readonly>
-<input type="submit" value="Reset Your Card" name="reset">
-</form>
+		
+		<P style="font-size:30px;" align=center>This page is still in development. Thank you for being patient with us while we work on this page.</p>
+		<br>
 <hr style="height:5px;background-color:black;border-width:0;color:gray;">
 <p style="text-align:center; font-size: 19px;">Developed by Nico Minnich, Justin Xia, and Henry Cooper</p>
 	</body>
