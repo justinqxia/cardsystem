@@ -4,21 +4,6 @@ from datetime import datetime
 from playsound import playsound
 import mysql.connector
 
-#Indexes for cards
-#0- ID number
-#1- First Name
-#2- Last Name
-#3- Email
-#4- Floor
-#5- Card
-#6- Destination
-#7- Date
-#8- Sign-out Time
-#9- Expected Return Time
-#10- Actual Return Time
-#11- Companion
-#12- Special Permission
-
 #Upload csv file to arrays
 file = open("cards.csv")
 csvreader = csv.reader(file)
