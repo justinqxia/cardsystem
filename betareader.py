@@ -48,11 +48,14 @@ def read():
     for row in rows:
         if(row[0]==studentid):
             if(len(row[7])==0):
+                fetchdata(row)
                 signout(row)
+                writesignout(row)
                 print(row[1]+" "+row[2]+" signed out")
                 print("")
             else:
                 signin(row)
+                deletedata(row)
                 print(row[1]+" "+row[2]+" signed in")
                 print("")
         
@@ -168,8 +171,11 @@ def curfew(row,cardcolor):
 #fetch data from database
 def fetchdata(row):
   con = mysql.connector.connect(
-    host="localhost", user="root",
-    password="", database="phplogin")
+    host="localhost", 
+    user="root",
+    password="", 
+    database="phplogin"
+    )
   cursor = con.cursor()
 
   query = "select * from cards"
@@ -193,6 +199,43 @@ def fetchdata(row):
       row[9]=line[2]
       row[12]=line[3]
     line=[]
+
+def deletedata(row):
+    mydb = mysql.connector.connect(
+    host="localhost", 
+    user="root",
+    password="", 
+    database="phplogin"
+    )
+
+    mycursor = mydb.cursor()
+
+    line=[]
+    line.append(row[0])
+
+    sql = "DELETE FROM cards WHERE id = %s"
+    adr = (line)
+
+    mycursor.execute(sql, adr)
+
+    mydb.commit()
+
+def writesignout(row):
+    mydb = mysql.connector.connect(
+    host="localhost", 
+    user="root",
+    password="", 
+    database="phplogin"
+    )
+
+    mycursor = mydb.cursor()
+
+    sql = "UPDATE cards SET signout = %s WHERE id = %s"
+    val=(row[8], row[0])
+
+    mycursor.execute(sql,val)
+
+    mydb.commit()
 
 #Run first instance of the program
 read()
