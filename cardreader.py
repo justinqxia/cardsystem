@@ -49,7 +49,7 @@ def read():
         csvwriter.writerows(rows)
     
     #Check for error with swiping card
-    if(len(cardinfo)!=60):
+    if((len(cardinfo)!=60)and(len(cardinfo)!=1)):
         playsound('error.wav')
         window = tk.Tk()
         label = tk.Label(
