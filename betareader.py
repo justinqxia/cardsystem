@@ -35,12 +35,13 @@ def read():
             if(len(row[7])==0):
                 fetchdata(row)
                 signout(row)
-                writesignout(row)
+                clearcard(row)
+                movetoslots(row)
                 print(row[1]+" "+row[2]+" signed out")
                 print("")
             else:
                 signin(row)
-                deletedata(row)
+                clearslots(row)
                 print(row[1]+" "+row[2]+" signed in")
                 print("")
         
@@ -185,7 +186,7 @@ def fetchdata(row):
       row[12]=line[3]
     line=[]
 
-def deletedata(row):
+def clearcard(row):
     mydb = mysql.connector.connect(
     host="localhost", 
     user="root",
@@ -205,7 +206,7 @@ def deletedata(row):
 
     mydb.commit()
 
-def writesignout(row):
+def clearslots(row):
     mydb = mysql.connector.connect(
     host="localhost", 
     user="root",
@@ -215,12 +216,33 @@ def writesignout(row):
 
     mycursor = mydb.cursor()
 
-    sql = "UPDATE cards SET signout = %s WHERE id = %s"
-    val=(row[8], row[0])
+    line=[]
+    line.append(row[0])
 
-    mycursor.execute(sql,val)
+    sql = "DELETE FROM slots WHERE id = %s"
+    adr = (line)
+
+    mycursor.execute(sql, adr)
 
     mydb.commit()
+
+def movetoslots(row):
+    mydb = mysql.connector.connect(
+    host="localhost", 
+    user="root",
+    password="", 
+    database="phplogin"
+    )
+
+    mycursor = mydb.cursor()
+
+    sql = "INSERT INTO slots (destination, companion, return1, sp, id, email, firstname, lastname, floor, signout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    val = (row[6],row[11],row[9],row[12],row[0],row[3],row[1],row[2],row[4],row[8])
+    mycursor.execute(sql, val)
+
+    mydb.commit()
+
+    print(mycursor.rowcount, "record inserted.")
 
 #Run first instance of the program
 read()
