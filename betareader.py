@@ -248,8 +248,6 @@ def movetoslots(row):
 
     mydb.commit()
 
-    print(mycursor.rowcount, "record inserted.")
-
 #Run first instance of the program
 read()
 
