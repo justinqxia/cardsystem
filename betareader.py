@@ -35,14 +35,20 @@ def read():
             if(len(row[7])==0):
                 fetchdata(row)
                 signout(row)
-                clearcard(row)
                 movetoslots(row)
-                print(row[1]+" "+row[2]+" signed out")
+                if(row[5]=="White"):
+                    print(row[1]+" "+row[2]+" signed in (NECP)")
+                else:
+                    print(row[1]+" "+row[2]+" signed out")
                 print("")
             else:
-                signin(row)
+                signin(row)                
+                clearcard(row)
                 clearslots(row)
-                print(row[1]+" "+row[2]+" signed in")
+                if(row[5]=="White"):
+                    print(row[1]+" "+row[2]+" signed out (NECP)")
+                else:
+                    print(row[1]+" "+row[2]+" signed in")
                 print("")
         
     with open("cards.csv", 'w', newline='') as csvfile:
