@@ -26,10 +26,10 @@ $stmt->close();
 
 $stmt1->bind_param('i', $_SESSION['id']);
 $stmt1->execute();
-$stmt1->bind_result($type1);
+$stmt1->bind_result($type);
 $stmt1->fetch();
 $stmt1->close();
-if ($type1=='staff'||'staff1') {
+if ($type=='staff') {
 	echo '';
 }
 	else {
@@ -39,8 +39,9 @@ if ($type1=='staff'||'staff1') {
 <!DOCTYPE html>
 <html>
 	<head>
+	<link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 		<meta charset="utf-8">
-		<title>Profile Page</title>
+		<title>Edit Cards</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<script src="https://kit.fontawesome.com/6f277423d3.js" crossorigin="anonymous"></script>

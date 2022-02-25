@@ -12,11 +12,12 @@ if ( mysqli_connect_errno() ) {
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
-// Now we check if the data from the login form was submitted, isset() will check if the data exists.
-if ( !isset($_POST['username'], $_POST['password']) ) {
+// Now check if the data from the login form was submitted, isset() will check if the data exists.
+if ( !isset($_POST['email'], $_POST['password']) ) {
 	// Could not get the data that should have been sent.
 	exit('<html>
     <head>
+        <link rel="icon" type="image/x-icon" href="favicon-32x32.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="utf-8">
         <title>Login - IASMH</title>
@@ -29,10 +30,10 @@ if ( !isset($_POST['username'], $_POST['password']) ) {
             <h1>Login</h1>
             <center><img src="download.png" alt="Academy Logo"></center>
             <form action="authenticate.php" method="post">
-                <label for="username">
+                <label for="email">
                     <i class="fas fa-user"></i>
                 </label>
-                <input type="text" name="username" placeholder="Username" id="username" required>
+                <input type="text" name="email" placeholder="Email" id="email" required>
                 <label for="password">
                     <i class="fas fa-lock"></i>
                 </label>
@@ -46,14 +47,14 @@ if ( !isset($_POST['username'], $_POST['password']) ) {
 </html>');
 }
 // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-if ($stmt = $con->prepare('SELECT id, password, type1 FROM accounts WHERE username = ?')) {
+if ($stmt = $con->prepare('SELECT id, password, type1 FROM accounts WHERE email = ?')) {
 	// Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
-	$stmt->bind_param('s', $_POST['username']);
+	$stmt->bind_param('s', $_POST['email']);
 	$stmt->execute();
 	// Store the result so we can check if the account exists in the database.
 	$stmt->store_result();
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $password, $type1);
+        $stmt->bind_result($id, $password, $type);
         $stmt->fetch();
         // Account exists, now we verify the password.
         if ($_POST['password'] === $password) {
@@ -62,19 +63,19 @@ if ($stmt = $con->prepare('SELECT id, password, type1 FROM accounts WHERE userna
             // header('Location: homestudent.php');
             session_regenerate_id();
             $_SESSION['loggedin'] = TRUE;
-            $_SESSION['name'] = $_POST['username'];
+            $_SESSION['name'] = $_POST['email'];
             $_SESSION['id'] = $id;
-            $_SESSION['type1'] = $type1;
-            if ($type1=='staff') {
+            $_SESSION['type1'] = $type;
+            if ($type=='staff') {
                 header('Location: homestaff.php');
             }
-                elseif ($type1=='residential') {
+                elseif ($type=='residential') {
                     header('Location: homestudent.php');
                 }
-                    elseif ($type1=='necp') {
+                    elseif ($type=='necp') {
                         header('Location: homenecp.php');
                     }
-                        elseif ($type1=='staff1') {
+                        elseif ($type=='staff1') {
                             header('Location: homestaff.php');
                         }
                         else {
@@ -86,6 +87,7 @@ if ($stmt = $con->prepare('SELECT id, password, type1 FROM accounts WHERE userna
         echo 
         '<html>
         <head>
+            <link rel="icon" type="image/x-icon" href="favicon-32x32.png">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta charset="utf-8">
             <title>Login - IASMH</title>
@@ -98,10 +100,10 @@ if ($stmt = $con->prepare('SELECT id, password, type1 FROM accounts WHERE userna
                 <h1>Login</h1>
                 <center><img src="download.png" alt="Academy Logo"></center>
                 <form action="authenticate.php" method="post">
-                    <label for="username">
+                    <label for="email">
                         <i class="fas fa-user"></i>
                     </label>
-                    <input type="text" name="username" placeholder="Username" id="username" required>
+                    <input type="text" name="email" placeholder="Email" id="email" required>
                     <label for="password">
                         <i class="fas fa-lock"></i>
                     </label>

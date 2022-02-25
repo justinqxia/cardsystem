@@ -15,14 +15,14 @@ if (mysqli_connect_errno()) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT password, email, type1 FROM accounts WHERE id = ?');
+$stmt = $con->prepare('SELECT password, email, type1, lastname, firstname FROM accounts WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
-$stmt->bind_result($password, $email, $type1);
+$stmt->bind_result($password, $email, $type, $lastname, $firstname);
 $stmt->fetch();
 $stmt->close();
-if ($type1=='staff'||'staff1') {
+if ($type=='staff') {
 	echo '';
 }
 	else {
@@ -32,6 +32,7 @@ if ($type1=='staff'||'staff1') {
 <!DOCTYPE html>
 <html>
 	<head>
+	<link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 	<style>
       table,
 
@@ -45,7 +46,7 @@ if ($type1=='staff'||'staff1') {
 	}
     </style>
 		<meta charset="utf-8">
-		<title>Home Page</title>
+		<title>Groundings</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
         <script src="https://kit.fontawesome.com/6f277423d3.js" crossorigin="anonymous"></script>

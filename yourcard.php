@@ -15,17 +15,38 @@ if (mysqli_connect_errno()) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT companion, destination, sp, return1, destination1 FROM cards WHERE id = ?');
+$stmt = $con->prepare('SELECT companion, destination, sp, return1, destination1, signout FROM cards WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
-$stmt->bind_result($companion, $destination, $sp, $return1, $destination1);
+$stmt->bind_result($companion, $destination, $sp, $return1, $destination1, $signout);
 $stmt->fetch();
 $stmt->close();
+//Get info to redirect residential students to necpcard.php
+$stmt = $con->prepare('SELECT password, email, type1, floor FROM accounts WHERE id = ?');
+$stmt->bind_param('i', $_SESSION['id']);
+$stmt->execute();
+$stmt->bind_result($password, $email, $type, $floor);
+$stmt->fetch();
+$stmt->close();
+
+$stmt = $con->prepare('SELECT status FROM comments WHERE id = ?');
+$stmt->bind_param('i', $_SESSION['id']);
+$stmt->execute();
+$stmt->bind_result($status);
+$stmt->fetch();
+$stmt->close();
+if ($type=='necp') {
+	header('Location: necpcard.php');
+	}
+		else {
+		echo'';
+	}
 ?>
 <!DOCTYPE html>
 <html>
 	<head>
+    <link rel="icon" type="image/x-icon" href="favicon-32x32.png">
     <style>
 table, th, td {
   border: 1px solid black;
@@ -71,24 +92,43 @@ table, th, td {
                         Companion
                     </td>
                     <td>
+                        Sign Out Time
+                    </td>
+                    <td>
                         Expected Return Time
                     </td>
                     <td>
                         Special Permission (SP)
                     </td>
+                    <td>
+                        Status
+                    </td>
                 </tr>
                 <tr>
                     <td>
-			        <?=$destination?><p> </p><?=$destination1?>
+			        <?php
+                    if ($destination=='Other') {
+                        echo $destination1;
+                    }
+                    else {
+                        echo $destination;
+                    }
+                    ?>
                     </td>
                     <td>
                     <?=$companion?>
+                    </td>
+                    <td>
+                    <?=$signout?>
                     </td>
                     <td>
                     <?=$return1?>
                     </td>
                     <td>
                     <?=$sp?>
+                    </td>
+                    <td>
+                    <?=$status?>
                     </td>
             </table>
 		</div>

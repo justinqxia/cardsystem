@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+    <link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 		<meta charset="utf-8">
 		<title>Card Submission</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
@@ -19,18 +20,18 @@
 
 <center><?php
 if (isset($_POST['submit'])) {
-    if (isset($_POST['return1']) && isset($_POST['destination']) && isset($_POST['destination1']) &&
-        isset($_POST['companion']) && isset($_POST['sp']) &&
-        isset($_POST['id']) && isset($_POST['email']) && isset($_POST['name'])) {
+    if (isset($_POST['return1']) && isset($_POST['destination']) && isset($_POST['floor'])) {
         
         $return1 = $_POST['return1'];
         $destination = $_POST['destination'];
         $destination1 = $_POST['destination1'];
+        $id = $_POST['id'];
+        $firstname = $_POST['firstname'];
+        $lastname = $_POST['lastname'];
+        $email = $_POST['email'];
+        $floor = $_POST['floor'];
         $companion = $_POST['companion'];
         $sp = $_POST['sp'];
-        $id = $_POST['id'];
-        $name = $_POST['name'];
-        $email = $_POST['email'];
         
         $host = "localhost";
         $dbUsername = "root";
@@ -44,7 +45,7 @@ if (isset($_POST['submit'])) {
         }
         else {
             $Select = "SELECT id FROM cards WHERE id = ? LIMIT 1";
-            $Insert = "INSERT INTO cards(destination, destination1, companion, return1, sp, id, email, name) values(?, ?, ?, ?, ?, ?, ?, ?)";
+            $Insert = "INSERT INTO cards(destination, destination1, return1, id, email, firstname, lastname, floor, companion, sp) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $conn->prepare($Select);
             $stmt->bind_param("i", $id);
@@ -58,7 +59,7 @@ if (isset($_POST['submit'])) {
                 $stmt->close();
 
                 $stmt = $conn->prepare($Insert);
-                $stmt->bind_param("sssssiss", $destination, $destination1, $companion, $return1, $sp, $id, $email, $name);
+                $stmt->bind_param("sssisssiss", $destination, $destination1, $return1, $id, $email, $firstname, $lastname, $floor, $companion, $sp);
                 if ($stmt->execute()) {
                     echo "Your card has succesufuly been uploaded to the database and you are ready to sign out!";
                 }
@@ -67,14 +68,14 @@ if (isset($_POST['submit'])) {
                 }
             }
             else {
-                echo "You have already filled out your card. To fill it out agian please delete your previous card information by pressing the reset button.";
+                echo 'You have already filled out your card. To fill it out agian please delete your previous card information by pressing the reset button.';
             }
             $stmt->close();
             $conn->close();
         }
     }
     else {
-        echo "Please go back and fill out everything in the form.";
+        echo 'Please go back and fill out everything in the form.';
         die();
     }
 }
@@ -82,7 +83,7 @@ else {
     echo "Submit button is not set.";
 }
 ?></center>
-<form action="reset.php">
+<form action="reset.php" style="text-align: center; ">
 <!--ID Number Here--><input type="hidden" name="id" value="<?=$_SESSION['id']?>" readonly>
 <input type="submit" value="Reset Your Card" name="reset">
 </form>

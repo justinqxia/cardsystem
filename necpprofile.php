@@ -15,15 +15,15 @@ if (mysqli_connect_errno()) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT password, email, color, id, floor, type1 FROM accounts WHERE id = ?');
+$stmt = $con->prepare('SELECT password, email, color, id, floor, type1, firstname, lastname FROM accounts WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
-$stmt->bind_result($password, $email, $color, $id, $floor, $type1);
+$stmt->bind_result($password, $email, $color, $id, $floor, $type, $firstname, $lastname);
 $stmt->fetch();
 $stmt->close();
 
-if ($type1=='residential') {
+if ($type=='residential') {
 	header('Location: studentprofile.php');
 	}
 		else {
@@ -33,6 +33,7 @@ if ($type1=='residential') {
 <!DOCTYPE html>
 <html>
 	<head>
+	<link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 		<meta charset="utf-8">
 		<title>Profile Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
@@ -55,7 +56,7 @@ if ($type1=='residential') {
 				<table>
 					<tr>
 						<td>Name:</td>
-						<td><?=$email?></td>
+						<td><?=$firstname?> <?=$lastname?></td>
 					</tr>
 					<tr>
 						<td>Email:</td>
@@ -64,10 +65,6 @@ if ($type1=='residential') {
 					<tr>
 						<td>ID Number:</td>
 						<td><?=$id?></td>
-					</tr>
-					<tr>
-						<td>Your Card Color:</td>
-						<td><?=$color?></td>
 					</tr>
 				</table>
 			</div>

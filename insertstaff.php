@@ -15,14 +15,14 @@ if (mysqli_connect_errno()) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT password, email, type1 FROM accounts WHERE id = ?');
+$stmt = $con->prepare('SELECT password, email, type FROM accounts WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
-$stmt->bind_result($password, $email, $type1);
+$stmt->bind_result($password, $email, $type);
 $stmt->fetch();
 $stmt->close();
-if ($type1=='staff'||'staff1') {
+if ($type1=='staff') {
 	echo '';
 }
 	else {
@@ -32,6 +32,7 @@ if ($type1=='staff'||'staff1') {
 <!DOCTYPE html>
 <html>
 	<head>
+    <link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 		<meta charset="utf-8">
 		<title>Overnight/Sick Card Submission</title>
 		<link href="style.css" rel="stylesheet" type="text/css">

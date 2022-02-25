@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+    <link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 		<meta charset="utf-8">
 		<title>Card Submission</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
@@ -21,7 +22,8 @@
 if (isset($_POST['submit'])) {
     if (isset($_POST['return1']) && isset($_POST['destination']) && isset($_POST['destination1']) &&
         isset($_POST['companion']) && isset($_POST['sp']) &&
-        isset($_POST['id']) && isset($_POST['email']) && isset($_POST['name']) && isset($_POST['floor'])) {
+        isset($_POST['id']) && isset($_POST['email']) && isset($_POST['firstname']) && isset($_POST['lastname']) && 
+        isset($_POST['floor'])) {
         
         $return1 = $_POST['return1'];
         $destination = $_POST['destination'];
@@ -29,7 +31,8 @@ if (isset($_POST['submit'])) {
         $companion = $_POST['companion'];
         $sp = $_POST['sp'];
         $id = $_POST['id'];
-        $name = $_POST['name'];
+        $firstname = $_POST['firstname'];
+        $lastname = $_POST['lastname'];
         $email = $_POST['email'];
         $floor = $_POST['floor'];
         
@@ -45,7 +48,7 @@ if (isset($_POST['submit'])) {
         }
         else {
             $Select = "SELECT id FROM cards WHERE id = ? LIMIT 1";
-            $Insert = "INSERT INTO cards(destination, destination1, companion, return1, sp, id, email, floor) values(?, ?, ?, ?, ?, ?, ?, ?)";
+            $Insert = "INSERT INTO cards(destination, destination1, companion, return1, sp, id, email, floor, firstname, lastname) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $conn->prepare($Select);
             $stmt->bind_param("i", $id);
@@ -59,7 +62,7 @@ if (isset($_POST['submit'])) {
                 $stmt->close();
 
                 $stmt = $conn->prepare($Insert);
-                $stmt->bind_param("sssssisi", $destination, $destination1, $companion, $return1, $sp, $id, $email, $floor);
+                $stmt->bind_param("sssssisiss", $destination, $destination1, $companion, $return1, $sp, $id, $email, $floor, $firstname, $lastname);
                 if ($stmt->execute()) {
                     echo "Your card has succesufuly been uploaded to the database and you are ready to sign out!";
                 }

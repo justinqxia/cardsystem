@@ -15,14 +15,14 @@ if (mysqli_connect_errno()) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT password, email, type1, floor FROM accounts WHERE id = ?');
+$stmt = $con->prepare('SELECT password, email, type1, floor, firstname, lastname FROM accounts WHERE id = ?');
 // In this case we can use the account ID to get the account info.
 $stmt->bind_param('i', $_SESSION['id']);
 $stmt->execute();
-$stmt->bind_result($password, $email, $type1, $floor);
+$stmt->bind_result($password, $email, $type, $floor, $firstname, $lastname);
 $stmt->fetch();
 $stmt->close();
-if ($type1=='residential') {
+if ($type=='residential') {
 	echo '';
 	}
 	else {
@@ -32,6 +32,7 @@ if ($type1=='residential') {
 <!DOCTYPE html>
 <html>
 	<head>
+	<link rel="icon" type="image/x-icon" href="favicon-32x32.png">
 	<style>
       table,
 
@@ -64,6 +65,50 @@ function destinationselect(val){
    element.style.display='none';
 }
 </script>
+<!--Style for alert box-->
+<style>
+.alert {
+  padding: 20px;
+  background-color: #983841;
+  color: white;
+}
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.closebtn:hover {
+  color: black;
+}
+.glow {
+  color: #ffffff;
+  text-align: center;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+  }
+  
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+  }
+}
+div.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+</style>
+<!--end systle for alert box-->
 
 	</head>
 
@@ -78,34 +123,41 @@ function destinationselect(val){
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>
+	<!--start alert box-->
+	<div class="alert sticky">
+	<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+	<strong class="glow">Alert:</strong> The website is still being developed not all the features may be fully functional yet.
+	</div>
+	<!--end alert box-->
 		<div class="content">
 			<h2>Home Page</h2>
-			<p>Welcome back, <?=$email?>!</p>
+			<p>Welcome back, <?=$firstname?> <?=$lastname?>!</p>
 		</div>
 		<!--end menu-->
 <table class="center"><!--start form-->
 <form style="text-align:left;" action="insert.php" method="POST"><!-- autocomplete="off" -->
-<tr><td><!--ID Number Here--><input type="hidden" name="id" value="<?=$_SESSION['id']?>" readonly></td></tr>
-<tr><td><!--Email Address Here--><input type="hidden" name="email" value="<?=$_SESSION['name']?>" readonly></td></tr>
-<tr><td><!--Name Here--><input type="hidden" name="name" value="<?=$email?>" readonly></td></tr>
-<tr><td><!--Floor Here--><input type="hidden" name="floor" value="<?=$floor?>" readonly></td></tr>
+<tr><td><!--ID Number Here--><input type="hidden" name="id" value="<?=$_SESSION['id']?>" readonly></td>
+<td><!--Email Address Here--><input type="hidden" name="email" value="<?=$_SESSION['name']?>" readonly></td>
+<td><!--First Name Here--><input type="hidden" name="firstname" value="<?=$firstname?>" readonly></td>
+<td><!--Last Name Here--><input type="hidden" name="lastname" value="<?=$lastname?>" readonly></td>
+<td><!--Floor Here--><input type="hidden" name="floor" value="<?=$floor?>" readonly></td></tr>
 <tr><td style="text-align:left;"><select name="destination" onchange='destinationselect(this.value);' required> 
 	<option value="">Please select a destination</option>
     <option value="Atrium">Atrium</option>
-    <option value="Ball_Gym">Ball Gym</option>
+    <option value="Ball Gym">Ball Gym</option>
     <option value="Bracken" >Bracken Library</option>
     <option value="Burris" >Burris</option>
     <option value="Goldform">Gold Form</option>
-    <option value="North_Dinning" >North Dining</option>
+    <option value="North Dinning" >North Dining</option>
 	<option value="Noyer" >Noyer</option>
-	<option value="NECP" >NECP</option>
     <option value="Quad" >Quad</option>
     <option value="Tally" >Student Center/Tally</option>
     <option value="Village" >Village</option>
+	<option value="Woodworth" >Woodworth</option>
     <option value="Other">Other</option>
   </select></td></tr>
 <tr><td style="text-align:left;"><input type="text" name="destination1" placeholder="Type destination here" id="box" style='display:none;'></td></tr>
-<tr><td style="text-align:left;"><label for="return1">Excpected time of return:</label>
+<tr><td style="text-align:left;"><label for="return1">Expected time of return:</label>
 <input type="time" id="return1" name="return1" required></td></tr>
 <tr><td style="text-align:left;"><label for="chkPassport">
     <input type="checkbox" name="companion" id="chkPassport" onclick="ShowHideDiv(this)">

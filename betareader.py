@@ -36,6 +36,7 @@ def read():
                 fetchdata(row)
                 signout(row)
                 movetoslots(row)
+                getstatus(row)
                 if(row[5]=="White"):
                     print(row[1]+" "+row[2]+" signed in (NECP)")
                 else:
@@ -247,6 +248,42 @@ def movetoslots(row):
     mycursor.execute(sql, val)
 
     mydb.commit()
+
+def getstatus(row):
+  con = mysql.connector.connect(
+    host="localhost", 
+    user="root",
+    password="", 
+    database="phplogin"
+    )
+  cursor = con.cursor()
+
+  query = "select * from comments"
+  cursor.execute(query)
+
+  forms = cursor.fetchall()
+    
+  line=[] 
+  stnum=int(row[0])
+  # fetch all columns
+  for block in forms:
+    for x in block:
+      line.append(x)
+    if(line[0]=="Other"):
+      line.pop(0)
+    else:
+      line.pop(1)
+    if(stnum == line[0]):
+      status=line[1]
+    line=[]
+
+    mycursor = con.cursor()
+
+    sql = "INSERT INTO slots (status) VALUES (%s)"
+    val = (status)
+    mycursor.execute(sql, val)
+
+    con.commit()
 
 #Run first instance of the program
 read()
