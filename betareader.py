@@ -14,9 +14,9 @@ for row in csvreader:
     rows.append(row)
 
 #initialize list of possible shortcuts
-shortcuts=["1","2","3","4","0"]
+shortcuts=["1","2","3","4","5","6","7","0"]
 
-def read():    
+def readSwipe():    
     #Read card for ID number
     cardinfo = input("Please swipe your card")
     if(cardinfo=="1"):
@@ -38,18 +38,18 @@ def read():
                 movetoslots(row)
                 getstatus(row)
                 if(row[5]=="White"):
-                    print(row[1]+" "+row[2]+" signed in (NECP)")
+                    print(row[8]+" "+row[1]+" "+row[2]+" signed in (NECP)")
                 else:
-                    print(row[1]+" "+row[2]+" signed out")
+                    print(row[8]+" "+row[1]+" "+row[2]+" signed out")
                 print("")
             else:
                 signin(row)                
                 clearcard(row)
                 clearslots(row)
                 if(row[5]=="White"):
-                    print(row[1]+" "+row[2]+" signed out (NECP)")
+                    print(row[10]+" "+row[1]+" "+row[2]+" signed out (NECP)")
                 else:
-                    print(row[1]+" "+row[2]+" signed in")
+                    print(row[10]+" "+row[1]+" "+row[2]+" signed in")
                 print("")
         
     with open("cards.csv", 'w', newline='') as csvfile:
@@ -76,7 +76,7 @@ def read():
         #Make the window jump above all
         window.attributes('-topmost',True)
         window.mainloop()
-    read()
+    readSwipe()
 #end def read
 
 #for signing out of the building
@@ -137,6 +137,51 @@ def shortcut(cardinfo):
         for row in rows:
             curfew(row,cardcolor)
         print("")
+    #edit a card
+    if(cardinfo=="5"):
+        searchname=input("What is the email of the student you are searching for? Do not add '@bsu.edu")
+        searchname = searchname+"@bsu.edu"
+        for row in rows:
+            if(row[3]==searchname):
+                if(len(row[7])!=0):
+                    changecard(row)
+                    print("Card has been changed")
+                    print("")
+                else:
+                    print("Error: Student has not signed out")
+                    print("")
+    #clear a card
+    if(cardinfo=="6"):
+        searchname=input("What is the email of the student you are searching for? Do not add '@bsu.edu")
+        searchname = searchname+"@bsu.edu"
+        for row in rows:
+            if(row[3]==searchname):
+                clearcard(row)
+                clearslots(row)
+                for i in range(6,13):
+                    row[i]=''
+                print("Card has been cleared")
+                print("")
+    #clear a card
+    if(cardinfo=="7"):
+        safeguard=input("ARE YOU SURE??? type 'yes' to confirm")
+        if(safeguard=="yes"):
+            for row in rows:
+                for i in range(6,13):
+                    row[i]=''
+                clearslots(row)
+            with open("cards.csv", 'w', newline='') as csvfile:
+                csvwriter = csv.writer(csvfile)
+                # writing the fields 
+                csvwriter.writerow(header) 
+                # writing the data rows 
+                csvwriter.writerows(rows)
+            print("All cards have been cleared")
+            print("")
+        else:
+            print("Cancelling clear")
+            print("")
+
     #pull up list of shortcuts
     if(cardinfo=="0"):
         print("List of shortcuts:")
@@ -144,7 +189,9 @@ def shortcut(cardinfo):
         print("2 - list of everyone signed out right now")
         print("3 - list of everyone signed out before 6:30")
         print("4 - list of people signed out with a particular card color")
-        print("")
+        print("5 - Edit someone's card")
+        print("6 - Clear someone's card")
+        print("7 - Clear ALL cards")
 
 #list of people signed out
 def listout(row):
@@ -193,6 +240,7 @@ def fetchdata(row):
       row[12]=line[3]
     line=[]
 
+#Clears line in cards database
 def clearcard(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -213,6 +261,7 @@ def clearcard(row):
 
     mydb.commit()
 
+#Clears line in slots database
 def clearslots(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -233,6 +282,7 @@ def clearslots(row):
 
     mydb.commit()
 
+#Writes information into slots database
 def movetoslots(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -249,6 +299,7 @@ def movetoslots(row):
 
     mydb.commit()
 
+#gets status from comments and writes it to slots
 def getstatus(row):
   con = mysql.connector.connect(
     host="localhost", 
@@ -275,8 +326,8 @@ def getstatus(row):
       line.pop(1)
     if(stnum == line[0]):
       status=line[1]
-    line=[]
 
+    line=[]
     mycursor = con.cursor()
 
     sql = "INSERT INTO slots (status) VALUES (%s)"
@@ -285,7 +336,38 @@ def getstatus(row):
 
     con.commit()
 
+#Changes value on someon'es card
+def changecard(row):
+    schangeindex="0"
+    validchange = ["6","9","11","12"]
+    while(schangeindex not in validchange):
+        schangeindex=input("What index would you like to change? 6-Destination, 9-Expected Return Time, 11-Companion, 12-SP")
+    changevalue=input("What would you like to change this value to? For time, enter in 'XX:XX:XX' format")
+    ichangeindex=int(schangeindex)
+    row[ichangeindex]=changevalue
+    clearslots(row)
+    clearcard(row)
+    movetoslots(row)
+
+    #writes change to cards database
+    mydb = mysql.connector.connect(
+    host="localhost", 
+    user="root",
+    password="", 
+    database="phplogin"
+    )
+
+    mycursor = mydb.cursor()
+
+    sql = "INSERT INTO cards (destination, companion, return1, sp, id, email, firstname, lastname, floor, signout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    val = (row[6],row[11],row[9],row[12],row[0],row[3],row[1],row[2],row[4],row[8])
+    mycursor.execute(sql, val)
+
+    mydb.commit()
+
+    return row
+
 #Run first instance of the program
-read()
+readSwipe()
 
 file.close()
