@@ -20,3 +20,4 @@ Indexes for cards
 10- Actual Return Time
 11- Companion
 12- Special Permission
+13- Status
