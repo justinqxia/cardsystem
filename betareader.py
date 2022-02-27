@@ -14,7 +14,7 @@ for row in csvreader:
     rows.append(row)
 
 #initialize list of possible shortcuts
-shortcuts=["1","2","3","4","5","6","7","0"]
+shortcuts=["1","2","3","4","5","6","7","8","0"]
 
 def readSwipe():    
     #Read card for ID number
@@ -35,21 +35,24 @@ def readSwipe():
             if(len(row[7])==0):
                 fetchdata(row)
                 signout(row)
-                movetoslots(row)
                 getstatus(row)
-                if(row[5]=="White"):
+                movetoslots(row)
+                checkform(row)
+                if((row[5]=="White")and(len(row[6])!=0)):
                     print(row[8]+" "+row[1]+" "+row[2]+" signed in (NECP)")
-                else:
+                elif(len(row[6])!=0):
                     print(row[8]+" "+row[1]+" "+row[2]+" signed out")
                 print("")
             else:
                 signin(row)                
                 clearcard(row)
                 clearslots(row)
+                now = datetime.now()
+                returntime = now.strftime("%H:%M:%S")
                 if(row[5]=="White"):
-                    print(row[10]+" "+row[1]+" "+row[2]+" signed out (NECP)")
+                    print(returntime+" "+row[1]+" "+row[2]+" signed out (NECP)")
                 else:
-                    print(row[10]+" "+row[1]+" "+row[2]+" signed in")
+                    print(returntime+" "+row[1]+" "+row[2]+" signed in")
                 print("")
         
     with open("cards.csv", 'w', newline='') as csvfile:
@@ -65,7 +68,7 @@ def readSwipe():
         playsound('error.wav')
         window = tk.Tk()
         label = tk.Label(
-            text="Error\nPlease swipe again",
+            text="Error: Card Read Incorrectly\nPlease swipe again",
             font=("Arial", 50),
             fg="red",
             bg="white",
@@ -114,6 +117,29 @@ def signin(row):
     for i in range(6,13):
       row[i]=''
     return row  
+
+#Checks to make sure student has filled out form
+def checkform(row):
+    if(len(row[6]) == 0):
+        for i in range(6,13):
+            row[i]=''
+        clearcard(row)
+        clearslots(row)
+        playsound('error.wav')
+        window = tk.Tk()
+        label = tk.Label(
+            text="Error: No Form Submitted\nPlease fill out form\nand swipe again",
+            font=("Arial", 50),
+            fg="red",
+            bg="white",
+            width=25,
+            height=10
+        )
+        label.pack()
+        #Make the window jump above all
+        window.attributes('-topmost',True)
+        window.mainloop()
+        return row
 
 #shortcut function
 def shortcut(cardinfo):
@@ -181,7 +207,52 @@ def shortcut(cardinfo):
         else:
             print("Cancelling clear")
             print("")
+    #add new users
+    if(cardinfo=="8"):
+        con = mysql.connector.connect(
+            host="localhost", 
+            user="root",
+            password="", 
+            database="phplogin"
+            )
+        cursor = con.cursor()
 
+        query = "select * from accounts"
+        cursor.execute(query)
+
+        forms = cursor.fetchall()
+        
+        student=["White","Pink","Yellow","Green","Blue"]
+        line=[] 
+        # fetch all columns
+        for block in forms:
+            found = 0
+            for x in block:
+                line.append(x)
+            for row in rows:
+                stnum=int(row[0])
+                if(stnum == line[0]):
+                    found = found +1
+            if((found==0)and(line[6] in student)):
+                newrow=[]
+                newrow.append(line[0])
+                newrow.append(line[1])
+                newrow.append(line[2])
+                newrow.append(line[3])
+                newrow.append(line[7])
+                newrow.append(line[6])
+                while(len(newrow)!=14):
+                    newrow.append("")
+                rows.append(newrow)
+                with open("cards.csv", 'w', newline='') as csvfile:
+                    csvwriter = csv.writer(csvfile)
+                    # writing the fields 
+                    csvwriter.writerow(header) 
+                    # writing the data rows 
+                    csvwriter.writerows(rows)
+                    print("New users have been added")
+            line=[]
+        print("")
     #pull up list of shortcuts
     if(cardinfo=="0"):
         print("List of shortcuts:")
@@ -192,6 +263,7 @@ def shortcut(cardinfo):
         print("5 - Edit someone's card")
         print("6 - Clear someone's card")
         print("7 - Clear ALL cards")
+        print("8 - Add new users from accounts database to csv file")
 
 #list of people signed out
 def listout(row):
@@ -210,35 +282,35 @@ def curfew(row,cardcolor):
 
 #fetch data from database
 def fetchdata(row):
-  con = mysql.connector.connect(
-    host="localhost", 
-    user="root",
-    password="", 
-    database="phplogin"
-    )
-  cursor = con.cursor()
+    con = mysql.connector.connect(
+        host="localhost", 
+        user="root",
+        password="", 
+        database="phplogin"
+        )
+    cursor = con.cursor()
 
-  query = "select * from cards"
-  cursor.execute(query)
+    query = "select * from cards"
+    cursor.execute(query)
 
-  forms = cursor.fetchall()
-    
-  line=[] 
-  stnum=int(row[0])
-  # fetch all columns
-  for block in forms:
-    for x in block:
-      line.append(x)
-    if(line[0]=="Other"):
-      line.pop(0)
-    else:
-      line.pop(1)
-    if(stnum == line[4]):
-      row[6]=line[0]
-      row[11]=line[1]
-      row[9]=line[2]
-      row[12]=line[3]
-    line=[]
+    forms = cursor.fetchall()
+        
+    line=[] 
+    stnum=int(row[0])
+    # fetch all columns
+    for block in forms:
+        for x in block:
+            line.append(x)
+        if(line[0]=="Other"):
+            line.pop(0)
+        else:
+            line.pop(1)
+        if(stnum == line[4]):
+            row[6]=line[0]
+            row[11]=line[1]
+            row[9]=line[2]
+            row[12]=line[3]
+        line=[]
 
 #Clears line in cards database
 def clearcard(row):
@@ -293,48 +365,36 @@ def movetoslots(row):
 
     mycursor = mydb.cursor()
 
-    sql = "INSERT INTO slots (destination, companion, return1, sp, id, email, firstname, lastname, floor, signout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    val = (row[6],row[11],row[9],row[12],row[0],row[3],row[1],row[2],row[4],row[8])
+    sql = "INSERT INTO slots (destination, companion, return1, sp, id, email, firstname, lastname, floor, signout,status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)"
+    val = (row[6],row[11],row[9],row[12],row[0],row[3],row[1],row[2],row[4],row[8],row[13])
     mycursor.execute(sql, val)
 
     mydb.commit()
 
 #gets status from comments and writes it to slots
 def getstatus(row):
-  con = mysql.connector.connect(
-    host="localhost", 
-    user="root",
-    password="", 
-    database="phplogin"
-    )
-  cursor = con.cursor()
+    con = mysql.connector.connect(
+        host="localhost", 
+        user="root",
+        password="", 
+        database="phplogin"
+        )
+    cursor = con.cursor()
 
-  query = "select * from comments"
-  cursor.execute(query)
+    query = "select * from comments"
+    cursor.execute(query)
 
-  forms = cursor.fetchall()
-    
-  line=[] 
-  stnum=int(row[0])
-  # fetch all columns
-  for block in forms:
-    for x in block:
-      line.append(x)
-    if(line[0]=="Other"):
-      line.pop(0)
-    else:
-      line.pop(1)
-    if(stnum == line[0]):
-      status=line[1]
-
+    forms = cursor.fetchall()
+        
     line=[]
-    mycursor = con.cursor()
-
-    sql = "INSERT INTO slots (status) VALUES (%s)"
-    val = (status)
-    mycursor.execute(sql, val)
-
-    con.commit()
+    # fetch all columns
+    for block in forms:
+        for x in block:
+            line.append(x)
+        if(row[3] == line[0]):
+            row[13]=line[1]
+            return row
+        line=[]
 
 #Changes value on someon'es card
 def changecard(row):
