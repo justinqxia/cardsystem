@@ -13,7 +13,7 @@ rows = []
 for row in csvreader:
     rows.append(row)
 
-#initialize list of possible shortcuts
+#initialize list of shortcuts
 shortcuts=["1","2","3","4","5","6","7","8","0"]
 
 def readSwipe():    
@@ -23,9 +23,8 @@ def readSwipe():
         print("exiting")
         return
     studentid = cardinfo[45:54]
-    #print(id)
 
-    #use shortcut function
+    #use if a shortcut is entered, go to shotcut function
     if(cardinfo in shortcuts):
         shortcut(cardinfo)
 
@@ -283,7 +282,7 @@ def curfew(row,cardcolor):
     if((len(row[7])!=0)and(row[5]==cardcolor)):
         print(row[1]+" "+row[2])
 
-#fetch data from database
+#grab data from database using id number
 def fetchdata(row):
     con = mysql.connector.connect(
         host="localhost", 
@@ -315,7 +314,7 @@ def fetchdata(row):
             row[12]=line[3]
         line=[]
 
-#Clears line in cards database
+#Clears the student's line in cards database
 def clearcard(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -336,7 +335,7 @@ def clearcard(row):
 
     mydb.commit()
 
-#Clears line in slots database
+#Clears student's line in slots database
 def clearslots(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -357,7 +356,7 @@ def clearslots(row):
 
     mydb.commit()
 
-#Writes information into slots database
+#Writes the student's array information into slots database
 def movetoslots(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -374,7 +373,7 @@ def movetoslots(row):
 
     mydb.commit()
 
-#gets status from comments and writes it to slots
+#gets status from comments database and writes it to slots database
 def getstatus(row):
     con = mysql.connector.connect(
         host="localhost", 
@@ -403,7 +402,7 @@ def getstatus(row):
             return row
         line=[]
 
-#updates cards database
+#writes student's info into cards database
 def updatecard(row):
     mydb = mysql.connector.connect(
     host="localhost", 
@@ -420,7 +419,7 @@ def updatecard(row):
 
     mydb.commit()
 
-#Changes value on someon'es card
+#Changes a value in student's row in both slots and cards database
 def changecard(row):
     schangeindex="0"
     validchange = ["6","9","11","12"]
