@@ -31,6 +31,9 @@ Beta Testing change notes:
 -Make website more mobile friendly/possibly develop an app
 -Add some sort of indicator for successful swipes
 
+Hardware:
+We began developing a physical housing for an Arduino, which would set off a light to indicate if the student had signed in/out correctly or not. The housing has two green lights and a red light, along with an LED display. The two green lights would indicate whether the student was leaving or returning, and the LED display would show what kind of error if the red light turned on.
+
 Indexes for cards
 0- ID number
 1- First Name
