@@ -22,6 +22,7 @@ Usage Procedure:
 -Student then comes to the front desk and swipes their Ball State ID at the magnetic stripe reader in order to sign out
 -Upon signing back into the building, student then swipes their card again at the front desk
 
+# The login page for the card system
 <img width="1177" alt="Screen Shot 2022-07-21 at 8 51 20 PM" src="https://user-images.githubusercontent.com/73600482/180338663-96f81550-1ca3-467e-80bd-4630c15b6b83.png">
 
 
